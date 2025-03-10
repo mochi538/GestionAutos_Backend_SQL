@@ -21,7 +21,7 @@ module.exports = {
       valorAlquiler: {
         type: Sequelize.FLOAT
       },
-      anio: {
+      year: {
         type: Sequelize.STRING
       },
       disponibilidad: {

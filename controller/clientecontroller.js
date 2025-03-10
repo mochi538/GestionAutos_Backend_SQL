@@ -32,7 +32,13 @@ exports.loginCliente = async (req, res) => {
 exports.registrarCliente = async (req, res) => {
   try {
     const { nombre, correo, numLic, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 es el número de salt rounds
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const existe = await Cliente.findOne({where:{correo}});
+    if(existe){
+      return res.status(400).json({error:'Usuario existente'})
+    }
+
     const nuevoCliente = await Cliente.create({
       nombre,
       correo,
@@ -50,7 +56,9 @@ exports.registrarCliente = async (req, res) => {
 
 exports.verClientes = async (req, res) => {
   try {
-    const clientes = await Cliente.findAll();
+    const clientes = await Cliente.findAll({
+      attributes:['id','nombre','correo','numLi','createdAt', 'updatedAt']
+    });
     res.json(clientes);
   } catch (error) {
     console.error("Error al obtener los clientes:", error);
