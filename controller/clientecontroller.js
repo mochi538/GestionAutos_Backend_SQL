@@ -57,7 +57,7 @@ exports.registrarCliente = async (req, res) => {
 exports.verClientes = async (req, res) => {
   try {
     const clientes = await Cliente.findAll({
-      attributes:['id','nombre','correo','numLi','createdAt', 'updatedAt']
+      attributes:['id','nombre','correo','numLic','createdAt', 'updatedAt']
     });
     res.json(clientes);
   } catch (error) {

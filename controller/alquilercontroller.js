@@ -44,7 +44,7 @@ exports.historial = async (req, res) => {
             ]
         });
         res.json(alquileres);
-    } catch (e) {
+    } catch(e) {
         console.error(e); 
         res.json({ mensaje: "Error al obtener el historial de alquileres",error: e.message});
     }
