@@ -2,6 +2,12 @@ const express = require('express');
 const app = express();
 require("dotenv").config();
 
+const cors = require('cors');
+app.use(cors({
+  origin: '*', // Permite solicitudes desde cualquier origen
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 const alquilerR = require("./routes/alquilerroutes");
 const autosR = require("./routes/autosroutes");
 const clientesR = require("./routes/clienteroutes");
