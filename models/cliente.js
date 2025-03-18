@@ -6,11 +6,7 @@ const {Model} = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Cliente extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+    
     static associate(models) {
       Cliente.hasMany(models.Alquiler, { foreignKey: 'clienteId' });
     }
@@ -39,22 +35,8 @@ module.exports = (sequelize, DataTypes) => {
   {
     sequelize,
     modelName: 'Cliente',
-    tableName: 'clientes',
-    hooks:{
-      beforeCreate: async (cliente)=>{
-        if (cliente.password){
-          const salt = await bcrypt.genSalt(10);
-          cliente.password = await bcrypt.hash(cliente.password, salt);
-        }
-    },
-    beforeUpdate: async (cliente) =>{
-      if (cliente.password && cliente.changed('password')){
-        const salt = await bcrypt.genSalt(10);
-        cliente.password = await bcrypt.hash(cliente.password, salt);
-      }
-    }
-  },
-}
-);
+    tableName: 'clientes'
+  }
+)
   return Cliente;
 };

@@ -1,33 +1,50 @@
-const bcrypt = require("bcrypt");
 const { Cliente } = require("../models");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt")
 
-//login
 exports.loginCliente = async (req, res) => {
   try {
     const { correo, password } = req.body;
+    
+    // Buscar el cliente en la base de datos
     const cliente = await Cliente.findOne({ where: { correo } });
+
     if (!cliente) {
-      return res.status(404).json({ mjs: "Cliente no encontrado" });
+      return res.status(404).json({ msg: "Cliente no encontrado" });
     }
+
+    // Validar la contraseña
     const passwordValido = await bcrypt.compare(password, cliente.password);
+    console.log(`Tipo de password ingresado: ${typeof password}`);
+    console.log(`Resultado bcrypt.compare: ${passwordValido}`);
 
     if (!passwordValido) {
-      return res.status(401).json({ mjs: "Contraseña incorrecta", password });
+      console.log("Password:", cliente.password);
+      return res.status(401).json({ msg: "Contraseña incorrecta" });
     }
+
+    // Generar el token
     const token = jwt.sign(
-      { id: cliente.id, correo: cliente.correo }, // Payload del token
-      process.env.JWT_SECRET, // Asegúrate de tener una clave secreta en el .env
-      { expiresIn: '1h' } // El token expirará en 1 hora
+      { id: cliente.id, correo: cliente.correo },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
-    return res.status(200).json({ msg: "Autenticación exitosa" });
+
+    return res.status(200).json({
+      msg: "Autenticación exitosa",
+      token,
+      cliente: {
+        id: cliente.id,
+        nombre: cliente.nombre,
+        correo: cliente.correo,
+      },
+    });
   } catch (error) {
-    console.error("Error al iniciara sesion:", error);
-    res
-      .status(500)
-      .json({ msj: "Error al iniciar sesion", error: error.message });
+    console.error("Error al iniciar sesión:", error.message);
+    res.status(500).json({ msg: "Error interno del servidor" });
   }
 };
+
 ////////////////////////////
 exports.registrarCliente = async (req, res) => {
   try {
@@ -46,6 +63,7 @@ exports.registrarCliente = async (req, res) => {
       password: hashedPassword,
     });
     res.status(201).json(nuevoCliente);
+    console.log(`Contraseña: ${nuevoCliente.password}`)
   } catch (error) {
     console.error("Error al crear el cliente:", error);
     res
@@ -53,6 +71,17 @@ exports.registrarCliente = async (req, res) => {
       .json({ mensaje: "Error al crear el cliente", error: error.message });
   }
 };
+
+exports.actualizarPassword = async(req, res)=> {
+  const nuevoHash = await bcrypt.hash("nueva_contraseña", 10);
+
+  await Cliente.update(
+    { password: nuevoHash },
+    { where: { correo: "prueba@gmail.com" } }
+  );
+
+  console.log("Contraseña actualizada correctamente");
+}
 
 exports.verClientes = async (req, res) => {
   try {
